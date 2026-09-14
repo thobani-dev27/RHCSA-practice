@@ -166,27 +166,30 @@ ls -la /common/
 
 ---
 
-### Q7. Create and Extract Archives
+### Q7. Create Archives
 
-> Create a compressed archive of /etc named /root/etc-backup.tar.gz, then extract it to /root/etc-extracted
+## Gzip
 
+### Create a gzip-compressed archive of `/etc` named `/root/etc-backup.tar.gz`.
 ```bash
-# Step 1: Create a compressed tar archive of /etc
-tar -czvf /root/etc-backup.tar.gz /etc
-
-# Step 2: Verify the archive was created
-ls -la /root/etc-backup.tar.gz
-
-# Step 3: Create extraction directory
-mkdir -p /root/etc-extracted
-
-# Step 4: Extract the archive into it
-tar -xzvf /root/etc-backup.tar.gz -C /root/etc-extracted
-
-# Step 5: Verify contents were extracted
-ls /root/etc-extracted
+   tar -czvf /root/etc-backup.tar.gz /etc
 ```
-> `-c` create, `-z` gzip compress, `-x` extract, `-v` verbose, `-f` specify filename. `-C` extracts into a target directory instead of the current one.
+### Create a gzip-compressed archive of `/var/log` named `/backup/logs.tar.gz`.
+```bash
+   tar -czvf /backup/logs.tar.gz /var/log
+```
+
+## Bzip2
+
+### Create a bzip2-compressed archive of `/home` named `/root/home-backup.tar.bz2`.
+```bash
+   tar -cjvf /root/home-backup.tar.bz2 /home
+```
+### Create a bzip2-compressed archive of `/opt` named `/backup/opt.tar.bz2`.
+```bash
+   tar -cjvf /backup/opt.tar.bz2 /opt
+```
+> `-c` create, `-z` gzip compress, `-x` extract, `-v` verbose, `-f` specify filename. 
 
 ### Q8. Configure NTP Client
 
