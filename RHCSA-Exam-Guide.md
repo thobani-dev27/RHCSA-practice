@@ -166,6 +166,28 @@ ls -la /common/
 
 ---
 
+### Q7. Create and Extract Archives
+
+> Create a compressed archive of /etc named /root/etc-backup.tar.gz, then extract it to /root/etc-extracted
+
+```bash
+# Step 1: Create a compressed tar archive of /etc
+tar -czvf /root/etc-backup.tar.gz /etc
+
+# Step 2: Verify the archive was created
+ls -la /root/etc-backup.tar.gz
+
+# Step 3: Create extraction directory
+mkdir -p /root/etc-extracted
+
+# Step 4: Extract the archive into it
+tar -xzvf /root/etc-backup.tar.gz -C /root/etc-extracted
+
+# Step 5: Verify contents were extracted
+ls /root/etc-extracted
+```
+> `-c` create, `-z` gzip compress, `-x` extract, `-v` verbose, `-f` specify filename. `-C` extracts into a target directory instead of the current one.
+
 ### Q8. Configure NTP Client
 
 > Configure your system as an NTP client of classroom.example.com
@@ -201,7 +223,7 @@ ls -la /root/found
 
 ---
 
-### Q. Find Files with SUID Permission
+### Q10. Find Files with SUID Permission
 
 ```bash
 # Step 1: Create Directory
@@ -216,7 +238,7 @@ ls -la /root/SUID-files
 
 ---
 
-### Q10. Find String 'strato' from Dictionary
+### Q11. Find String 'strato' from Dictionary
 
 ```bash
 # Step 1: Grep
@@ -228,7 +250,7 @@ cat /searchfile.txt
 
 ---
 
-### Q11. Configure Autofs for NFS Home Directories
+### Q12. Configure Autofs for NFS Home Directories
 
 > Automount netuserX home directory from classroom.example.com:/home/guests/netuserX. Must be writable. Password: ablerate
 
@@ -255,7 +277,7 @@ pwd
 
 ---
 
-### Q12. Create User with Specific UID
+### Q13. Create User with Specific UID
 
 > Create user barry with UID 2112 and set password atenorth
 
@@ -272,7 +294,7 @@ id barry
 
 ---
 
-### Q13. Grant Sudo Privileges Without Password
+### Q14. Grant Sudo Privileges Without Password
 
 > Group 'elite' must have administrative permission without password
 
@@ -291,7 +313,7 @@ visudo -c
 
 ---
 
-### Q14. Download and Build Container Image
+### Q15. Download and Build Container Image
 
 > Download Containerfile from http://classroom.example.com/Containerfile. Do not modify. Build the image.
 
@@ -322,7 +344,7 @@ podman images
 
 ---
 
-### Q15. Configure Container as Systemd Service
+### Q16. Configure Container as Systemd Service
 
 > Create container 'mycontainer' from built image. Mount /opt/file to /opt/incoming and /opt/processed to /opt/outgoing. Run as user xanadu. Auto-start on reboot.
 
