@@ -1,4 +1,4 @@
-[RHCSA-Exam-Guide (2).md](https://github.com/user-attachments/files/32191052/RHCSA-Exam-Guide.2.md)
+[RHCSA-Exam-Guide.md](https://github.com/user-attachments/files/32191052/RHCSA-Exam-Guide.2.md)
 # RHCSA Exam — Study Guide & Solutions
 
 Primary & Secondary Machine Tasks
