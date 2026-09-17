@@ -147,7 +147,7 @@ minute hour day month weekday user command
 The five time fields are: MINUTE → HOUR → DAY → MONTH → WEEKDAY.
 
 ```
-0 2 * * * root /backup.sh
+10 2 * * * root /backup.sh
 ```
 This example runs `/backup.sh` as root at 02:00 every day.
 
