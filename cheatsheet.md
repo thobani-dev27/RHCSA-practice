@@ -1,7 +1,16 @@
 # Command Cheat Sheets
-```bash
 
-View your repo config files
+## YUM/DNF Repository
+
+Repositories tell RHEL where to get software and packages.
+
+```bash
+# View repository configuration
+cat /etc/yum.repos.d/*.repo
+```
+
+Example local repository:
+```ini
 [BaseOS]
 name=BaseOS
 baseurl=file:///mnt/iso/BaseOS
@@ -13,17 +22,28 @@ name=AppStream
 baseurl=file:///mnt/iso/AppStream
 enabled=1
 gpgcheck=0
-
 ```
-## SSHD Configuration (/etc/ssh/sshd_config)
+- `[BaseOS]` = repository name
+- `baseurl` = where packages are located
+- `enabled=1` = repository is ON
+- `gpgcheck=0` = package signature checking is disabled
+
+```bash
+dnf repolist
+dnf clean all
+dnf install package-name
+```
+
+---
+
+## SSHD Configuration (`/etc/ssh/sshd_config`)
 
 ```bash
 # Edit the config file
 vi /etc/ssh/sshd_config
-
 ```
 
-Common directives you'll be asked to set, just update them exactly as below:
+Common directives you'll be asked to set, just update them as below:
 
 ```
 PermitRootLogin yes
@@ -66,6 +86,19 @@ man semanage-fcontext
 
 ---
 
+## SELinux File Contexts
+
+Use file contexts when SELinux needs to recognize a directory as web content (or another service's content type).
+
+```bash
+semanage fcontext -a -t httpd_sys_content_t "/web(/.*)?"
+restorecon -Rv /web
+ls -Z /web
+```
+> `semanage fcontext` sets the rule; `restorecon` applies the label.
+
+---
+
 ## Resizing Filesystems on an LVM Logical Volume
 
 General pattern: grow the LV first, then grow the filesystem on top of it.
@@ -101,22 +134,144 @@ resize2fs /dev/myvol/mydatabase
 | vfat       | Yes — `fatresize` requires it to be unmounted               | Yes — must unmount first   |
 | ntfs       | Yes — `ntfsresize` requires it to be unmounted               | Yes — must unmount first   |
 
+## Cron Jobs
 
-# For crontab structure use run:
+Cron automatically runs commands at scheduled times.
 
 ```bash
 cat /etc/crontab
+```
+```
+minute hour day month weekday user command
+```
+The five time fields are: MINUTE → HOUR → DAY → MONTH → WEEKDAY.
 
-# Example of job definition:
-# .---------------- minute (0 - 59)
-# |  .------------- hour (0 - 23)
-# |  |  .---------- day of month (1 - 31)
-# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
-# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
-# |  |  |  |  |
-# *  *  *  *  * user-name  command to be executed
+```
+0 2 * * * root /backup.sh
+```
+This example runs `/backup.sh` as root at 02:00 every day.
 
+For a user's own crontab, use the `crontab` command instead of editing a file directly:
+```bash
+crontab -e              # edit your own crontab
+crontab -l               # view your own crontab
+crontab -u natasha -l    # view another user's crontab, as root
+```
 
-To view Repo tamplete run: 
+---
 
-cat /etc/yum.repos.d/*.repo
+## Useful RHCSA Commands
+
+**Files & Directories**
+```bash
+pwd
+ls
+ls -l
+cd /directory
+mkdir directory
+touch file
+cp source destination
+mv old new
+rm file
+rm -r directory
+find / -name filename
+cat file
+vi file
+```
+
+**Services**
+```bash
+systemctl start service
+systemctl stop service
+systemctl restart service
+systemctl enable service
+systemctl status service
+```
+
+**Networking**
+```bash
+ip a
+ip r
+hostname
+```
+
+**Users**
+```bash
+useradd username
+passwd username
+usermod
+userdel username
+```
+
+**Permissions**
+```bash
+chmod
+chown
+chgrp
+```
+
+**Storage**
+```bash
+lsblk
+blkid
+df -h
+du -h
+mount
+umount
+```
+
+**LVM**
+```bash
+pvs
+vgs
+lvs
+pvcreate
+vgcreate
+lvcreate
+lvresize
+```
+
+**SELinux**
+```bash
+getenforce
+sestatus
+semanage
+restorecon
+ls -Z
+```
+
+**Firewall**
+```bash
+firewall-cmd --state
+firewall-cmd --list-all
+firewall-cmd --permanent --add-service=http
+firewall-cmd --reload
+```
+
+**Packages**
+```bash
+dnf install package
+dnf remove package
+dnf update
+dnf search package
+dnf repolist
+```
+
+---
+
+## RHCSA Exam Thinking Pattern
+
+```
+WHAT DO THEY WANT?
+    ↓
+WHICH SERVICE / FILE / STORAGE?
+    ↓
+WHICH COMMAND CHANGES IT?
+    ↓
+DO I NEED SELINUX?
+    ↓
+DO I NEED FIREWALL?
+    ↓
+HOW DO I VERIFY IT?
+```
+> Always verify your work after making a change.
