@@ -117,7 +117,7 @@ crontab -u natasha -l
 
 ### Q5. Create Users, Groups, and Group Memberships
 
-> Group: sysadmin. Users: ntombi, thapelo (sysadmin secondary group), tomas (no shell, not in sysadmin). All passwords: atenorth
+> Group: sysadmin. Users: ntombi, thapelo (sysadmin secondary group), thomas (no shell, not in sysadmin). All passwords: atenorth
 
 ```bash
 # Step 1: Create the sysadmin group
@@ -128,12 +128,18 @@ useradd -G sysadmin ntombi
 useradd -G sysadmin thapelo
 
 # Step 4: Create user tomas with no interactive shell
-useradd -s /sbin/nologin tomas
+useradd -s /sbin/nologin thomas
 
 # Step 5: Set password 'atenorth' for all users
 echo 'atenorth' | sudo passwd --stdin ntombi
 echo 'atenorth' | sudo passwd --stdin thapelo
-echo 'atenorth' | sudo passwd --stdin tomas
+echo 'atenorth' | sudo passwd --stdin thomas
+
+or
+
+passwd ntombi
+passwd thapelo
+passwd thomas
 
 # Step 6: Verify
 grep 'ntombi\|thapelo\|tomas\|sysadmin' /etc/group
@@ -203,6 +209,8 @@ server classroom.example.com iburst
 
 # Step 2: Restart chronyd
 systemctl restart chronyd
+systemctl enable --now chronyd
+systemctl status chronyd
 
 # Step 3: Verify time sync
 chronyc sources -v
@@ -211,14 +219,14 @@ chronyc sources -v
 
 ---
 
-### Q9. Find Files Owned by 'thomas' and Copy to /root/found
+### Q9. Find Files Owned by 'harry' and Copy to /root/found
 
 ```bash
 # Step 1: Create Directory
 mkdir -p /root/found
 
 # Step 2: Find
-find / -user thomas -type f -exec cp {} /root/found \; 2>/dev/null
+find / -user harry -type f -exec cp {} /root/found \; 2>/dev/null
 
 # Step 3: Verify
 ls -la /root/found
