@@ -1,85 +1,122 @@
 # Command Cheat Sheets
+```bash
 
-## SSHD Configuration (`/etc/ssh/sshd_config`)
+View your repo config files
+[BaseOS]
+name=BaseOS
+baseurl=file:///mnt/iso/BaseOS
+enabled=1
+gpgcheck=0
+
+[AppStream]
+name=AppStream
+baseurl=file:///mnt/iso/AppStream
+enabled=1
+gpgcheck=0
+
+```
+## SSHD Configuration (/etc/ssh/sshd_config)
 
 ```bash
 # Edit the config file
 vi /etc/ssh/sshd_config
-```
-
-Common directives you'll be asked to set:
 
 ```
-Port 22                          # change listening port
-PermitRootLogin no               # yes | no | prohibit-password
-PasswordAuthentication no        # disable password auth (key-only)
+
+Common directives you'll be asked to set, just update them exactly as below:
+
+```
+PermitRootLogin yes
+PasswordAuthentication yes
 PubkeyAuthentication yes
-PermitEmptyPasswords no
-AllowUsers ntombi thapelo        # restrict to specific users
-AllowGroups sysadmin             # restrict to specific group
-MaxAuthTries 3
-ClientAliveInterval 300
-Banner /etc/issue.net
 ```
 
 ```bash
-# Validate syntax before restarting (catches typos)
-sshd -t
-
 # Apply changes
 systemctl restart sshd
 
-# Verify it's listening
-ss -tlnp | grep sshd
+# Validate syntax before restarting (catches typos)
+sshd -t
+
+# Verify
+systemctl status sshd
 ```
-> If you change `Port`, remember to also update the firewall (`firewall-cmd --add-port=<port>/tcp --permanent`) and SELinux (`semanage port -a -t ssh_port_t -p tcp <port>`), same pattern as the httpd example below.
 
 ---
 
 ## SELinux Port Labeling (how to build the `semanage port` line)
 
-The pattern is always:
-
 ```bash
-semanage port -a -t <selinux_type> -p <protocol> <port_number>
+# To find this line: semanage port -a -t http_port_t -p tcp 82, run:
+man semanage-port
+
+# To find the /var/www/html, restorecon lines, run:
+man semanage-fcontext
 ```
-
-- `-a` = add a new port mapping (use `-m` to modify an existing one instead)
-- `-t <selinux_type>` = the SELinux port type the service expects (e.g. `http_port_t`, `ssh_port_t`)
-- `-p <protocol>` = `tcp` or `udp`
-- `<port_number>` = the port you're opening
-
-**How to find the right `-t` type for a service:**
-
-```bash
-# List all ports already associated with a type
-semanage port -l | grep http_port_t
-# Example output: http_port_t   tcp   80, 81, 443, 488, 8008, 8009, 8443, 9000
-
-# Search by keyword if you don't know the exact type name
-semanage port -l | grep -i http
-
-# Check what type a running service actually expects (from its process context)
-ps -eZ | grep httpd
-```
-
-So for httpd on a non-default port (82), you look up that `httpd` uses `http_port_t`, confirm 82 isn't already listed, then add it:
-
-```bash
-semanage port -a -t http_port_t -p tcp 82
-
-# Verify it was added
-semanage port -l | grep http_port_t
-```
-
-> If you get "port already defined" when adding, it means another service already owns that port under a different type — use `-m` (modify) instead of `-a`, or pick a different port.
 
 **Quick reference for common services:**
 
-| Service | SELinux type      | Default port |
-|---------|-------------------|--------------|
-| httpd   | `http_port_t`     | 80, 443      |
-| sshd    | `ssh_port_t`       | 22           |
-| ftp     | `ftp_port_t`       | 21           |
-| nfs     | `nfs_port_t`       | 2049         |
-| samba   | `smbd_port_t`      | 445          |
+| Service | SELinux type   | Default port |
+|---------|----------------|--------------|
+| httpd   | `http_port_t`  | 80, 443      |
+| sshd    | `ssh_port_t`   | 22           |
+| ftp     | `ftp_port_t`   | 21           |
+| nfs     | `nfs_port_t`   | 2049         |
+| samba   | `smbd_port_t`  | 445          |
+
+---
+
+## Resizing Filesystems on an LVM Logical Volume
+
+General pattern: grow the LV first, then grow the filesystem on top of it.
+
+```bash
+# vfat — unmount first, resize LV, then resize filesystem
+umount /database
+lvresize -L +500M /dev/myvol/mydatabase
+fatresize -s max /dev/myvol/mydatabase
+mount -a
+
+# ntfs — unmount first, resize LV, then resize filesystem
+umount /database
+lvresize -L +500M /dev/myvol/mydatabase
+ntfsresize -f /dev/myvol/mydatabase
+mount -a
+
+# xfs — must be mounted to grow, no shrink support
+lvresize -L +500M /dev/myvol/mydatabase
+xfs_growfs /database
+
+# ext4 — can grow mounted or unmounted
+lvresize -L +500M /dev/myvol/mydatabase
+resize2fs /dev/myvol/mydatabase
+```
+
+**Must the filesystem be unmounted to resize?**
+
+| Filesystem | Grow                                                     | Shrink                    |
+|------------|------------------------------------------------------------|----------------------------|
+| xfs        | No — `xfs_growfs` requires the filesystem to be mounted    | Not supported at all       |
+| ext4       | No — `resize2fs` can grow while mounted                    | Yes — must unmount first   |
+| vfat       | Yes — `fatresize` requires it to be unmounted               | Yes — must unmount first   |
+| ntfs       | Yes — `ntfsresize` requires it to be unmounted               | Yes — must unmount first   |
+
+
+# For crontab structure use run:
+
+```bash
+cat /etc/crontab
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name  command to be executed
+
+
+To view Repo tamplete run: 
+
+cat /etc/yum.repos.d/*.repo
