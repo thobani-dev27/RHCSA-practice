@@ -357,11 +357,11 @@ podman images
 
 ### Q16. Configure Container as Systemd Service
 
-> Create container 'mycontainer' from built image. Mount /opt/file to /opt/incoming and /opt/processed to /opt/outgoing. Run as user xanadu. Auto-start on reboot.
+> Create container 'mycontainer' from built image. Mount /opt/files to /opt/incoming and /opt/processed to /opt/outgoing. Run as user xanadu. Auto-start on reboot.
 
 ```bash
 # Step 1: Run the container with volume mounts
-podman run -d --name mycontainer -v /opt/file:/opt/incoming:Z -v /opt/processed:/opt/outgoing:Z myimage
+podman run -d --name mycontainer -v /opt/files:/opt/incoming:Z -v /opt/processed:/opt/outgoing:Z myimage
 
 # Step 2: Create systemd user directory and generate service file
 mkdir -p ~/.config/systemd/user
@@ -455,7 +455,7 @@ systemctl enable --now tuned
 tuned-adm recommend
 
 # Step 4: Apply the recommended profile
-tuned-adm profile <recommended-profile-name>
+tuned-adm profile $(recommended-profile-name)
 
 # Step 5: Verify
 tuned-adm active
@@ -507,7 +507,7 @@ swapon
 
 ### Secondary Q5. Create LVM with VG myvol and LV mydatabase
 
-> VG: myvol with 8MiB PE. LV: mydatabase with 100 PE. Format as vfat. Mount on /database permanently.
+> VG: myvol with 8MiB PE. LV: mydatabase with 100 PE. Format as xfs. Mount on /database permanently.
 
 ```bash
 # Step 1: Create the volume group with 8MiB physical extents
@@ -516,9 +516,9 @@ vgcreate -s 8M myvol /dev/sdb
 # Step 2: Create the logical volume with 100 extents
 lvcreate -l 100 -n mydatabase myvol
 
-# Step 3: Install dosfstools and format as vfat
+# Step 3: Install dosfstools and format as xfs
 dnf install -y dosfstools
-mkfs.vfat /dev/myvol/mydatabase
+mkfs.xfs /dev/myvol/mydatabase
 
 # Step 4: Create the mount directory
 mkdir /database
@@ -528,7 +528,7 @@ lsblk -f
 blkid /dev/myvol/mydatabase
 
 vi /etc/fstab
-# Add: UUID=<your-uuid> /database vfat defaults 0 0
+# Add: UUID=<your-uuid> /database xfs defaults 0 0
 
 # Step 6: Mount and verify
 systemctl daemon-reload
