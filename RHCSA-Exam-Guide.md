@@ -131,15 +131,16 @@ useradd -G sysadmin thapelo
 useradd -s /sbin/nologin thomas
 
 # Step 5: Set password 'atenorth' for all users
-echo 'atenorth' | sudo passwd --stdin ntombi
-echo 'atenorth' | sudo passwd --stdin thapelo
-echo 'atenorth' | sudo passwd --stdin thomas
-
-or
 
 passwd ntombi
 passwd thapelo
 passwd thomas
+
+or
+
+echo 'atenorth' | sudo passwd --stdin ntombi
+echo 'atenorth' | sudo passwd --stdin thapelo
+echo 'atenorth' | sudo passwd --stdin thomas
 
 # Step 6: Verify
 grep 'ntombi\|thapelo\|tomas\|sysadmin' /etc/group
