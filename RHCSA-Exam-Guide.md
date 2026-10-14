@@ -345,7 +345,7 @@ podman login classroom.example.com/Containerfile
 # Password:
 
 # Step 4: Get Containerfile
-curl -O http://classroom.example.com/Containerfile
+wget http://classroom.example.com/Containerfile
 
 # Step 5: Build the image
 podman build -t myimage .
